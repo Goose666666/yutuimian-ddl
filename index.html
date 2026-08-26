@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<script>try{var t=localStorage.getItem("ddl-theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
 <title>预推免倒计时</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap">
 </head>
@@ -68,6 +69,10 @@
   input { flex:1; min-width:200px }
   select:focus-visible, input:focus-visible, .seg button:focus-visible {
     outline:2px solid var(--accent); outline-offset:2px }
+  .ghost { background:var(--card); border:1px solid var(--line); border-radius:10px;
+    height:42px; padding:0 16px; color:var(--ink); cursor:pointer;
+    font:500 14px/1 "Noto Sans SC",sans-serif; margin-left:auto }
+  .ghost:focus-visible { outline:2px solid var(--accent); outline-offset:2px }
   .found { color:var(--mute); font-size:13px; padding:10px 2px }
 
   .month { position:sticky; top:66px; z-index:4; background:var(--paper);
@@ -135,6 +140,7 @@
     </div>
     <select id="sch"><option value="">所有学校</option><option value="东南大学">东南大学</option><option value="中山大学">中山大学</option><option value="北京邮电大学">北京邮电大学</option><option value="华东师范大学">华东师范大学</option><option value="南京大学">南京大学</option><option value="南开大学">南开大学</option><option value="同济大学">同济大学</option><option value="哈尔滨工业大学">哈尔滨工业大学</option><option value="复旦大学">复旦大学</option><option value="武汉大学">武汉大学</option><option value="浙江大学">浙江大学</option><option value="深圳大学">深圳大学</option><option value="电子科技大学">电子科技大学</option><option value="西安电子科技大学">西安电子科技大学</option><option value="重庆大学">重庆大学</option></select>
     <input id="kw" placeholder="搜学院或备注">
+    <button id="theme" class="ghost" type="button"></button>
   </div>
   <div class="found" id="found"></div>
   <div id="list"></div>
@@ -191,6 +197,23 @@ document.getElementById("bGone").onclick = () => setMode("gone", "bGone");
 document.getElementById("bAll").onclick = () => setMode("all", "bAll");
 document.getElementById("sch").onchange = render;
 document.getElementById("kw").oninput = render;
+
+const root = document.documentElement;
+const btn = document.getElementById("theme");
+const mq = matchMedia("(prefers-color-scheme: dark)");
+function curDark() {
+  const t = root.getAttribute("data-theme");
+  return t ? t === "dark" : mq.matches;
+}
+function paintBtn() { btn.textContent = curDark() ? "浅色" : "深色"; }
+btn.onclick = () => {
+  const next = curDark() ? "light" : "dark";
+  root.setAttribute("data-theme", next);
+  try { localStorage.setItem("ddl-theme", next); } catch (e) {}
+  paintBtn();
+};
+mq.addEventListener("change", paintBtn);
+paintBtn();
 render();
 </script>
 
