@@ -78,10 +78,11 @@
   .month { position:sticky; top:66px; z-index:4; background:var(--paper);
     font-family:"IBM Plex Mono",monospace; font-size:12px; letter-spacing:.14em;
     color:var(--mute); padding:14px 2px 8px; text-transform:uppercase }
-  .row { display:grid; grid-template-columns:6px 96px 92px 132px 1fr;
-    align-items:start; gap:0 14px; background:var(--card);
+  .row { display:grid; grid-template-columns:6px 1fr; background:var(--card);
     border:1px solid var(--line); border-radius:12px; margin-bottom:8px;
     overflow:hidden }
+  .body { display:grid; grid-template-columns:96px 92px 132px 1fr;
+    align-items:start; gap:0 14px }
   .rail { align-self:stretch; background:var(--rail) }
   .row.hot .rail { background:var(--hot) }
   .row.warm .rail { background:var(--warm) }
@@ -99,10 +100,22 @@
   .note { display:block; color:var(--mute); font-size:12.5px; margin-top:2px }
   .note.done { color:var(--ok) }
   @media (max-width:720px) {
-    .row { grid-template-columns:6px 1fr; gap:0 12px; padding-bottom:4px }
-    .when, .left, .sch { padding:10px 0 0 4px }
-    .left, .sch, .col { padding-left:4px }
-    .col { padding:4px 14px 12px 4px }
+    .body { grid-template-columns:auto 1fr; gap:0 10px; padding:10px 14px 11px 12px }
+    .when { grid-column:1; padding:0 }
+    .left { grid-column:2; padding:0; justify-self:start }
+    .sch { grid-column:1 / -1; padding:2px 0 0 }
+    .col { grid-column:1 / -1; padding:0 }
+    .note { margin-top:1px }
+    .stats { grid-template-columns:1fr 1fr; gap:8px }
+    .stat { padding:12px 14px }
+    .stat b { font-size:22px }
+    .bar { gap:8px }
+    .seg button { padding:0 13px }
+    select { min-width:0; flex:1 1 120px }
+    input { flex:1 1 60%; min-width:0 }
+    .ghost { margin-left:0; padding:0 14px }
+    .wrap { padding:26px 14px 60px }
+    header h1 { font-size:25px }
   }
 
   h2 { font-size:16px; font-weight:700; margin:38px 0 12px;
@@ -128,7 +141,7 @@
   <div class="stats">
     <div class="stat"><b class="num">45</b><span>还能报</span></div>
     <div class="stat"><b class="num">15</b><span>已截止</span></div>
-    <div class="stat hot"><b class="num">4 天</b><span>后 哈尔滨工业大学 截止</span></div>
+    <div class="stat hot"><b class="num">4 天后</b><span>哈尔滨工业大学</span></div>
     <div class="stat"><b class="num">15</b><span>所学校</span></div>
   </div>
 
@@ -174,12 +187,14 @@ function render() {
     html +=
       '<div class="row ' + sev(x.left) + '">' +
         '<div class="rail"></div>' +
-        '<div class="when num">' + Number(x.d.slice(3)) + " 日 " + x.t + "</div>" +
-        '<div class="left">' + leftText(x.left) + "</div>" +
-        '<div class="sch">' + esc(x.s) + "</div>" +
-        '<div class="col">' + esc(x.c) +
-          (x.n ? '<span class="note' + (x.n.startsWith("已") ? " done" : "") + '">'
-                 + esc(x.n) + "</span>" : "") +
+        '<div class="body">' +
+          '<div class="when num">' + Number(x.d.slice(3)) + " 日 " + x.t + "</div>" +
+          '<div class="left">' + leftText(x.left) + "</div>" +
+          '<div class="sch">' + esc(x.s) + "</div>" +
+          '<div class="col">' + esc(x.c) +
+            (x.n ? '<span class="note' + (x.n.startsWith("已") ? " done" : "") + '">'
+                   + esc(x.n) + "</span>" : "") +
+          "</div>" +
         "</div>" +
       "</div>";
   }
