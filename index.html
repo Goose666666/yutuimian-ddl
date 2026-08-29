@@ -2,167 +2,224 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<script>try{var t=localStorage.getItem("ddl-theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>预推免倒计时</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap">
-</head>
-<body>
 <style>
   :root {
-    --paper:#f7f8fa; --card:#ffffff; --ink:#171a1f; --mute:#6a7280;
-    --line:#e4e7ec; --rail:#d8dde4;
-    --accent:#0f6e64; --accent-soft:#e2f0ee;
-    --hot:#b3261e; --warm:#9a5b00; --cool:#4b5563; --ok:#0f6e64;
+    --bg: #fbfbfa;
+    --card: #ffffff;
+    --ink: #1a1a19;
+    --mute: #86867f;
+    --line: #e8e8e4;
+    --accent: #1b6b4f;
+    --hot: #c0392b;
+    --warm: #b5761f;
+    --cool: #4a7c8c;
+    --gone: #b8b8b2;
+    --shadow: 0 1px 2px rgba(20, 20, 18, .05);
+  }
+  :root:not([data-theme="light"]) {
+    color-scheme: light;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --paper:#14161a; --card:#1b1e24; --ink:#e6e8ec; --mute:#949aa4;
-      --line:#2a2f37; --rail:#333944;
-      --accent:#4bbfae; --accent-soft:#123330;
-      --hot:#f2766c; --warm:#e0a25c; --cool:#9aa1ac; --ok:#4bbfae;
+      --bg: #16171a;
+      --card: #1e1f23;
+      --ink: #e9e9e6;
+      --mute: #85868c;
+      --line: #2c2e33;
+      --accent: #4bb98c;
+      --hot: #e8705f;
+      --warm: #d8a45c;
+      --cool: #7ab0c2;
+      --gone: #55575d;
+      --shadow: none;
+      color-scheme: dark;
     }
   }
   :root[data-theme="dark"] {
-    --paper:#14161a; --card:#1b1e24; --ink:#e6e8ec; --mute:#949aa4;
-    --line:#2a2f37; --rail:#333944;
-    --accent:#4bbfae; --accent-soft:#123330;
-    --hot:#f2766c; --warm:#e0a25c; --cool:#9aa1ac; --ok:#4bbfae;
+    --bg: #16171a;
+    --card: #1e1f23;
+    --ink: #e9e9e6;
+    --mute: #85868c;
+    --line: #2c2e33;
+    --accent: #4bb98c;
+    --hot: #e8705f;
+    --warm: #d8a45c;
+    --cool: #7ab0c2;
+    --gone: #55575d;
+    --shadow: none;
+    color-scheme: dark;
   }
-  * { box-sizing:border-box }
+
+  * { box-sizing: border-box }
+  html { -webkit-text-size-adjust: 100% }
   body {
-    margin:0; background:var(--paper); color:var(--ink);
-    font-family:"Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
-    font-size:15px; line-height:1.7;
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI",
+      "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    padding: 40px 20px 64px;
   }
-  .wrap { max-width:1040px; margin:0 auto; padding:36px 20px 72px }
-  header h1 {
-    font-size:30px; font-weight:700; margin:0 0 6px; letter-spacing:-.01em;
-    text-wrap:balance;
-  }
-  .sub { color:var(--mute); font-size:13.5px; margin-bottom:26px }
-  .num { font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums }
+  .wrap { max-width: 880px; margin: 0 auto }
 
-  .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
-    gap:12px; margin-bottom:26px }
-  .stat { background:var(--card); border:1px solid var(--line); border-radius:12px;
-    padding:14px 16px; display:flex; flex-direction:column; gap:2px }
-  .stat b { font-family:"IBM Plex Mono",monospace; font-size:26px; font-weight:600;
-    line-height:1.2; font-variant-numeric:tabular-nums }
-  .stat span { color:var(--mute); font-size:12.5px; letter-spacing:.06em }
-  .stat.hot b { color:var(--hot) }
-
-  .bar { position:sticky; top:0; z-index:5; background:var(--paper);
-    padding:10px 0 12px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;
-    border-bottom:1px solid var(--line); margin-bottom:2px }
-  .seg { display:flex; border:1px solid var(--line); border-radius:10px;
-    overflow:hidden; background:var(--card) }
-  .seg button { border:0; background:transparent; color:var(--ink);
-    font:500 14px/1 "Noto Sans SC",sans-serif; padding:0 16px; height:42px;
-    cursor:pointer }
-  .seg button + button { border-left:1px solid var(--line) }
-  .seg button[aria-pressed="true"] { background:var(--accent); color:#fff }
-  select, input { font:400 14px/1 "Noto Sans SC",sans-serif; color:var(--ink);
-    background:var(--card); border:1px solid var(--line); border-radius:10px;
-    height:42px; padding:0 12px }
-  select { min-width:168px }
-  input { flex:1; min-width:200px }
-  select:focus-visible, input:focus-visible, .seg button:focus-visible {
-    outline:2px solid var(--accent); outline-offset:2px }
-  .ghost { background:var(--card); border:1px solid var(--line); border-radius:10px;
-    height:42px; padding:0 16px; color:var(--ink); cursor:pointer;
-    font:500 14px/1 "Noto Sans SC",sans-serif; margin-left:auto }
-  .ghost:focus-visible { outline:2px solid var(--accent); outline-offset:2px }
-  .found { color:var(--mute); font-size:13px; padding:10px 2px }
-
-  .month { position:sticky; top:66px; z-index:4; background:var(--paper);
-    font-family:"IBM Plex Mono",monospace; font-size:12px; letter-spacing:.14em;
-    color:var(--mute); padding:14px 2px 8px; text-transform:uppercase }
-  .row { display:grid; grid-template-columns:6px 1fr; background:var(--card);
-    border:1px solid var(--line); border-radius:12px; margin-bottom:8px;
-    overflow:hidden }
-  .body { display:grid; grid-template-columns:96px 92px 132px 1fr;
-    align-items:start; gap:0 14px }
-  .rail { align-self:stretch; background:var(--rail) }
-  .row.hot .rail { background:var(--hot) }
-  .row.warm .rail { background:var(--warm) }
-  .row.cool .rail { background:var(--accent) }
-  .row.gone { opacity:.62 }
-  .when { padding:13px 0 13px 4px; color:var(--mute); font-size:13px }
-  .left { padding:13px 0; font-family:"IBM Plex Mono",monospace; font-size:13px;
-    font-weight:600; font-variant-numeric:tabular-nums }
-  .row.hot .left { color:var(--hot) }
-  .row.warm .left { color:var(--warm) }
-  .row.cool .left { color:var(--accent) }
-  .row.gone .left { color:var(--mute); font-weight:400 }
-  .sch { padding:13px 0; font-weight:500 }
-  .col { padding:13px 14px 13px 0 }
-  .note { display:block; color:var(--mute); font-size:12.5px; margin-top:2px }
-  .note.done { color:var(--ok) }
-  @media (max-width:720px) {
-    .body { grid-template-columns:auto 1fr; gap:0 10px; padding:10px 14px 11px 12px }
-    .when { grid-column:1; padding:0 }
-    .left { grid-column:2; padding:0; justify-self:start }
-    .sch { grid-column:1 / -1; padding:2px 0 0 }
-    .col { grid-column:1 / -1; padding:0 }
-    .note { margin-top:1px }
-    .stats { grid-template-columns:1fr 1fr; gap:8px }
-    .stat { padding:12px 14px }
-    .stat b { font-size:22px }
-    .bar { gap:8px }
-    .seg button { padding:0 13px }
-    select { min-width:0; flex:1 1 120px }
-    input { flex:1 1 60%; min-width:0 }
-    .ghost { margin-left:0; padding:0 14px }
-    .wrap { padding:26px 14px 60px }
-    header h1 { font-size:25px }
+  h1 {
+    font-size: 27px; font-weight: 650; letter-spacing: -.4px;
+    margin: 0 0 22px;
   }
 
-  h2 { font-size:16px; font-weight:700; margin:38px 0 12px;
-    padding-bottom:8px; border-bottom:1px solid var(--line) }
-  .pend { background:var(--card); border:1px solid var(--line); border-radius:12px;
-    padding:4px 16px }
-  .pend div { padding:12px 0; border-top:1px solid var(--line);
-    display:grid; grid-template-columns:150px 1fr; gap:4px 14px }
-  .pend div:first-child { border-top:0 }
-  .pend b { font-weight:500 }
-  .pend em { font-style:normal; color:var(--mute); font-size:13px;
-    grid-column:2 }
-  footer { color:var(--mute); font-size:12.5px; margin-top:34px;
-    padding-top:14px; border-top:1px solid var(--line) }
+  .stats {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 1px; background: var(--line);
+    border: 1px solid var(--line); border-radius: 12px;
+    overflow: hidden; margin-bottom: 20px;
+  }
+  .stat { background: var(--card); padding: 15px 16px 14px }
+  .stat b {
+    display: block; font-size: 25px; font-weight: 620;
+    letter-spacing: -.6px; line-height: 1.15;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat span { font-size: 12.5px; color: var(--mute) }
+  .stat.hot b { color: var(--hot) }
+
+  .bar {
+    display: flex; gap: 9px; align-items: center;
+    flex-wrap: wrap; margin-bottom: 22px;
+  }
+  .seg {
+    display: flex; background: var(--card);
+    border: 1px solid var(--line); border-radius: 9px;
+    overflow: hidden; box-shadow: var(--shadow);
+  }
+  .seg button {
+    appearance: none; border: 0; background: transparent;
+    color: var(--mute); font: inherit; font-size: 14px;
+    padding: 9px 16px; cursor: pointer;
+    border-right: 1px solid var(--line);
+  }
+  .seg button:last-child { border-right: 0 }
+  .seg button[aria-pressed="true"] { background: var(--accent); color: #fff }
+
+  select, input[type="search"] {
+    appearance: none; font: inherit; font-size: 14px;
+    color: var(--ink); background: var(--card);
+    border: 1px solid var(--line); border-radius: 9px;
+    padding: 9px 13px; box-shadow: var(--shadow);
+  }
+  select {
+    padding-right: 32px; cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%2386867f' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 12px center;
+  }
+  input[type="search"] { flex: 1; min-width: 150px }
+  input::placeholder { color: var(--mute) }
+  #theme {
+    margin-left: auto; cursor: pointer; font: inherit; font-size: 14px;
+    color: var(--mute); background: var(--card);
+    border: 1px solid var(--line); border-radius: 9px;
+    padding: 9px 15px; box-shadow: var(--shadow);
+  }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+
+  .month {
+    font-size: 12.5px; font-weight: 600; color: var(--mute);
+    letter-spacing: .6px; margin: 24px 0 9px; padding-left: 2px;
+  }
+  .month:first-child { margin-top: 0 }
+
+  .row {
+    display: grid;
+    grid-template-columns: 96px 62px 1fr;
+    align-items: baseline; gap: 0 14px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--cool);
+    border-radius: 9px;
+    padding: 12px 16px; margin-bottom: 7px;
+    box-shadow: var(--shadow);
+  }
+  .row.hot { border-left-color: var(--hot) }
+  .row.warm { border-left-color: var(--warm) }
+  .row.gone { border-left-color: var(--gone); opacity: .58 }
+
+  .when {
+    font-size: 13px; color: var(--mute);
+    font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
+  .left {
+    font-size: 13.5px; font-weight: 600;
+    font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
+  .row.hot .left { color: var(--hot) }
+  .row.warm .left { color: var(--warm) }
+  .row.cool .left { color: var(--cool) }
+  .row.gone .left { color: var(--gone); font-weight: 500 }
+
+  .col { min-width: 0 }
+  .col em {
+    font-style: normal; color: var(--mute);
+    font-size: 13.5px; margin-right: 9px;
+  }
+
+  .empty {
+    color: var(--mute); text-align: center;
+    padding: 44px 0; font-size: 14px;
+  }
+
+  footer {
+    color: var(--mute); font-size: 12.5px;
+    margin-top: 40px; padding-top: 16px;
+    border-top: 1px solid var(--line);
+  }
+  footer a { color: inherit }
+
+  @media (max-width: 620px) {
+    body { padding: 26px 14px 48px }
+    h1 { font-size: 23px; margin-bottom: 18px }
+    .stats { grid-template-columns: repeat(2, 1fr) }
+    .stat b { font-size: 22px }
+    #theme { margin-left: 0 }
+    .row {
+      grid-template-columns: auto 1fr;
+      gap: 3px 12px; padding: 12px 14px;
+    }
+    .when { grid-column: 1 }
+    .left { grid-column: 2; justify-self: start }
+    .col { grid-column: 1 / -1 }
+    .col em { display: block; margin: 0 0 1px }
+  }
 </style>
 
 <div class="wrap">
   <header>
     <h1>预推免倒计时</h1>
-    <div class="sub">基准日 2026-08-28 · 共 135 条 · 凡查到过截止时间的学院全部收录</div>
   </header>
 
   <div class="stats">
-    <div class="stat"><b class="num">83</b><span>还能报</span></div>
-    <div class="stat"><b class="num">52</b><span>已截止</span></div>
-    <div class="stat hot"><b class="num">2 天后</b><span>北京科技大学</span></div>
-    <div class="stat"><b class="num">20</b><span>所学校</span></div>
+    <div class="stat"><b>83</b><span>还能报</span></div>
+    <div class="stat"><b>52</b><span>已截止</span></div>
+    <div class="stat hot"><b>2 天</b><span>北京科技大学</span></div>
+    <div class="stat"><b>20</b><span>所学校</span></div>
   </div>
 
   <div class="bar">
-    <div class="seg" role="group">
+    <div class="seg" role="group" aria-label="筛选">
       <button id="bOpen" aria-pressed="true">还能报</button>
       <button id="bGone" aria-pressed="false">已截止</button>
       <button id="bAll" aria-pressed="false">全部</button>
     </div>
-    <select id="sch"><option value="">所有学校</option><option value="上海交通大学">上海交通大学</option><option value="东南大学">东南大学</option><option value="中山大学">中山大学</option><option value="北京科技大学">北京科技大学</option><option value="北京邮电大学">北京邮电大学</option><option value="华东师范大学">华东师范大学</option><option value="华南理工大学">华南理工大学</option><option value="南京大学">南京大学</option><option value="南开大学">南开大学</option><option value="同济大学">同济大学</option><option value="哈尔滨工业大学">哈尔滨工业大学</option><option value="复旦大学">复旦大学</option><option value="大连理工大学">大连理工大学</option><option value="天津大学">天津大学</option><option value="武汉大学">武汉大学</option><option value="浙江大学">浙江大学</option><option value="深圳大学">深圳大学</option><option value="电子科技大学">电子科技大学</option><option value="西安电子科技大学">西安电子科技大学</option><option value="重庆大学">重庆大学</option></select>
-    <input id="kw" placeholder="搜学院或备注">
-    <button id="theme" class="ghost" type="button"></button>
+    <select id="sch" aria-label="学校"></select>
+    <input id="kw" type="search" placeholder="搜学校或学院">
+    <button id="theme"></button>
   </div>
-  <div class="found" id="found"></div>
+
   <div id="list"></div>
 
-  <h2>还没开或已经关掉的</h2>
-  <div class="pend"><div><b>电子科技大学</b><span>预推免尚未开放，系统里还没有这个招生项目</span><em>开了用优本计划同一个账号报</em></div><div><b>华南理工大学</b><span>注册通道还没开</span><em>用户号手机号或邮箱，初始密码身份证号</em></div><div><b>上海交通大学</b><span>注册 2026-07-20 已截止</span><em>盯 030 电子信息与电气工程学院会不会再开</em></div><div><b>北京师范大学</b><span>系统窗口外整站关闭，去年 9 月 3 日发通知</span><em>只有 040 人工智能学院对口，截止只给一周</em></div><div><b>全国推免服务系统</b><span>9 月下旬开</span><em>yz.chsi.com.cn/tm 才是最终备案口</em></div></div>
-
-  <footer>学院时间来自登录各校系统后拉的原始表与学院官方通知，最终以系统显示为准。
-    9 月下旬还要走教育部全国推免服务系统备案。</footer>
+  <footer>
+    数据来自各校研招系统与学院通知，基准日 2026-08-28。以学校官方公告为准。
+  </footer>
 </div>
 
 <script>
@@ -172,8 +229,13 @@ const esc = s => (s || "").replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"
 const sev = n => n < 0 ? "gone" : n <= 3 ? "hot" : n <= 9 ? "warm" : "cool";
 const leftText = n => n < 0 ? "已截止" : n === 0 ? "今天" : n === 1 ? "明天" : n + " 天";
 
+const sel = document.getElementById("sch");
+sel.innerHTML = '<option value="">所有学校</option>' +
+  [...new Set(DATA.map(x => x.s))].sort((a, b) => a.localeCompare(b, "zh"))
+    .map(s => '<option value="' + esc(s) + '">' + esc(s) + "</option>").join("");
+
 function render() {
-  const s = document.getElementById("sch").value;
+  const s = sel.value;
   const k = document.getElementById("kw").value.trim();
   const rows = DATA.filter(x =>
     (mode === "all" || (mode === "open") === (x.left >= 0)) &&
@@ -186,21 +248,15 @@ function render() {
     if (m !== month) { month = m; html += '<div class="month">' + Number(m) + " 月</div>"; }
     html +=
       '<div class="row ' + sev(x.left) + '">' +
-        '<div class="rail"></div>' +
-        '<div class="body">' +
-          '<div class="when num">' + Number(x.d.slice(3)) + " 日 " + x.t + "</div>" +
-          '<div class="left">' + leftText(x.left) + "</div>" +
-          '<div class="sch">' + esc(x.s) + "</div>" +
-          '<div class="col">' + esc(x.c) +
-            (x.n ? '<span class="note' + (x.n.startsWith("已") ? " done" : "") + '">'
-                   + esc(x.n) + "</span>" : "") +
-          "</div>" +
-        "</div>" +
+        '<div class="when">' + Number(x.d.slice(3)) + " 日 " + x.t + "</div>" +
+        '<div class="left">' + leftText(x.left) + "</div>" +
+        '<div class="col"><em>' + esc(x.s) + "</em>" + esc(x.c) + "</div>" +
       "</div>";
   }
-  document.getElementById("list").innerHTML = html || '<div class="found">没有符合的</div>';
-  document.getElementById("found").textContent = rows.length + " 条";
+  document.getElementById("list").innerHTML =
+    html || '<div class="empty">没有符合的</div>';
 }
+
 function setMode(m, id) {
   mode = m;
   for (const b of ["bOpen", "bGone", "bAll"])
@@ -210,12 +266,16 @@ function setMode(m, id) {
 document.getElementById("bOpen").onclick = () => setMode("open", "bOpen");
 document.getElementById("bGone").onclick = () => setMode("gone", "bGone");
 document.getElementById("bAll").onclick = () => setMode("all", "bAll");
-document.getElementById("sch").onchange = render;
+sel.onchange = render;
 document.getElementById("kw").oninput = render;
 
 const root = document.documentElement;
 const btn = document.getElementById("theme");
 const mq = matchMedia("(prefers-color-scheme: dark)");
+try {
+  const saved = localStorage.getItem("ddl-theme");
+  if (saved) root.setAttribute("data-theme", saved);
+} catch (e) {}
 function curDark() {
   const t = root.getAttribute("data-theme");
   return t ? t === "dark" : mq.matches;
