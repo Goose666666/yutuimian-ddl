@@ -16,6 +16,9 @@
     --warm: #b5761f;
     --cool: #4a7c8c;
     --gone: #b8b8b2;
+    --tag-sch-bg: #e8f1ec;
+    --tag-sch-ink: #1b6b4f;
+    --tag-col-bg: #f3f3f0;
     --shadow: 0 1px 2px rgba(20, 20, 18, .05);
   }
   :root:not([data-theme="light"]) {
@@ -33,6 +36,9 @@
       --warm: #d8a45c;
       --cool: #7ab0c2;
       --gone: #55575d;
+      --tag-sch-bg: #23392f;
+      --tag-sch-ink: #6fcfa4;
+      --tag-col-bg: #292b31;
       --shadow: none;
       color-scheme: dark;
     }
@@ -48,6 +54,9 @@
     --warm: #d8a45c;
     --cool: #7ab0c2;
     --gone: #55575d;
+    --tag-sch-bg: #23392f;
+    --tag-sch-ink: #6fcfa4;
+    --tag-col-bg: #292b31;
     --shadow: none;
     color-scheme: dark;
   }
@@ -157,11 +166,23 @@
   .row.cool .left { color: var(--cool) }
   .row.gone .left { color: var(--gone); font-weight: 500 }
 
-  .col { min-width: 0 }
-  .col em {
-    font-style: normal; color: var(--mute);
-    font-size: 13.5px; margin-right: 9px;
+  .col {
+    min-width: 0; display: flex; flex-wrap: wrap;
+    align-items: center; gap: 6px;
   }
+  .tag {
+    display: inline-block; font-size: 13px; line-height: 1.5;
+    padding: 2px 9px; border-radius: 6px; white-space: nowrap;
+  }
+  .tag.sch {
+    background: var(--tag-sch-bg); color: var(--tag-sch-ink);
+    font-weight: 550;
+  }
+  .tag.col-t {
+    background: var(--tag-col-bg); color: var(--ink);
+    white-space: normal;
+  }
+  .row.gone .tag.sch { background: var(--tag-col-bg); color: var(--mute) }
 
   .empty {
     color: var(--mute); text-align: center;
@@ -188,7 +209,7 @@
     .when { grid-column: 1 }
     .left { grid-column: 2; justify-self: start }
     .col { grid-column: 1 / -1 }
-    .col em { display: block; margin: 0 0 1px }
+    .col { gap: 5px }
   }
 </style>
 
@@ -250,7 +271,10 @@ function render() {
       '<div class="row ' + sev(x.left) + '">' +
         '<div class="when">' + Number(x.d.slice(3)) + " 日 " + x.t + "</div>" +
         '<div class="left">' + leftText(x.left) + "</div>" +
-        '<div class="col"><em>' + esc(x.s) + "</em>" + esc(x.c) + "</div>" +
+        '<div class="col">' +
+          '<span class="tag sch">' + esc(x.s) + "</span>" +
+          '<span class="tag col-t">' + esc(x.c) + "</span>" +
+        "</div>" +
       "</div>";
   }
   document.getElementById("list").innerHTML =
