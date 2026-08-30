@@ -48,8 +48,7 @@
 <div class="wrap">
 <div class="kicker">2027 · 官方系统原始数据</div>
 <h1>电子科技大学 2027 优本计划各院系报名时间</h1>
-<div class="sub">共 17 个院系，还开着 6 个。数据取自电子科大研究生招生管理信息系统的「申请院系开放查询」，那一页要登录且要短信口令才能看。成电的推免叫全国优秀本科生遴选计划。基准日 2026-08-30。
-<a href="../">返回全部学校</a></div>
+<div class="sub">共 17 个院系，还开着 6 个。数据取自电子科大研究生招生管理信息系统的「申请院系开放查询」，那一页要登录且要短信口令才能看。成电的推免叫全国优秀本科生遴选计划。<a href="../">返回全部学校</a></div>
 <table>
 <tr><th>代码</th><th>院系</th><th>开始</th><th>截止</th><th>剩余</th></tr>
 <tr class="gone"><td class="c">008</td><td>计算机科学与工程学院</td><td class="t">2026-07-01 00:00</td><td class="t">2026-07-05 17:00</td><td class="l">已截止</td></tr><tr class="gone"><td class="c">004</td><td>机械与电气工程学院</td><td class="t">2026-07-01 00:00</td><td class="t">2026-07-05 23:59</td><td class="l">已截止</td></tr><tr class="gone"><td class="c">016</td><td>公共管理学院</td><td class="t">2026-07-01 09:00</td><td class="t">2026-07-05 23:59</td><td class="l">已截止</td></tr><tr class="gone"><td class="c">022</td><td>通信抗干扰全国重点实验室</td><td class="t">2026-07-01 12:00</td><td class="t">2026-07-07 00:00</td><td class="l">已截止</td></tr><tr class="gone"><td class="c">005</td><td>光电科学与工程学院</td><td class="t">2026-07-01 09:00</td><td class="t">2026-07-10 17:00</td><td class="l">已截止</td></tr><tr class="gone"><td class="c">013</td><td>医学院</td><td class="t">2026-07-03 17:00</td><td class="t">2026-07-10 17:00</td><td class="l">已截止</td></tr><tr class="gone"><td class="c">003</td><td>材料与能源学院</td><td class="t">2026-07-01 00:00</td><td class="t">2026-07-13 21:00</td><td class="l">已截止</td></tr><tr class="gone"><td class="c">014</td><td>生命科学与技术学院</td><td class="t">2026-07-01 12:00</td><td class="t">2026-07-14 17:00</td><td class="l">已截止</td></tr><tr class="gone"><td class="c">031</td><td>集成电路科学与工程学院</td><td class="t">2026-07-15 09:00</td><td class="t">2026-08-14 17:00</td><td class="l">已截止</td></tr><tr class="gone"><td class="c">006</td><td>自动化工程学院</td><td class="t">2026-07-02 09:00</td><td class="t">2026-08-16 17:00</td><td class="l">已截止</td></tr><tr class="gone"><td class="c">001</td><td>信息与通信工程学院</td><td class="t">2026-07-01 15:00</td><td class="t">2026-08-21 17:00</td><td class="l">已截止</td></tr><tr class="open"><td class="c">007</td><td>资源与环境学院</td><td class="t">2026-07-01 00:00</td><td class="t">2026-08-30 23:59</td><td class="l">1 天</td></tr><tr class="open"><td class="c">010</td><td>航空航天学院</td><td class="t">2026-07-01 09:00</td><td class="t">2026-08-31 17:32</td><td class="l">2 天</td></tr><tr class="open"><td class="c">002</td><td>电子科学与工程学院</td><td class="t">2026-07-27 12:00</td><td class="t">2026-09-01 09:00</td><td class="l">3 天</td></tr><tr class="open"><td class="c">088</td><td>人文社科高等研究院</td><td class="t">2026-08-04 16:43</td><td class="t">2026-09-04 14:00</td><td class="l">6 天</td></tr><tr class="open"><td class="c">011</td><td>数学科学学院</td><td class="t">2026-07-10 11:00</td><td class="t">2026-09-04 23:59</td><td class="l">6 天</td></tr><tr class="open"><td class="c">015</td><td>经济与管理学院</td><td class="t">2026-07-17 00:00</td><td class="t">2026-09-04 23:59</td><td class="l">6 天</td></tr>
@@ -62,8 +61,6 @@
 (function () {
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const p = n => String(n).padStart(2, "0");
-  const stamp = today.getFullYear() + "-" + p(today.getMonth() + 1) + "-" + p(today.getDate());
   document.querySelectorAll("tbody tr, table tr").forEach(tr => {
     const tds = tr.querySelectorAll("td");
     if (tds.length < 2) return;
@@ -78,9 +75,6 @@
     const n = Math.round((new Date(a[0], a[1] - 1, a[2]) - today) / 86400000);
     cell.textContent = n < 0 ? "已截止" : n === 0 ? "今天" : n === 1 ? "明天" : n + " 天";
     tr.className = n < 0 ? "gone" : "open";
-  });
-  document.querySelectorAll(".sub, footer").forEach(e => {
-    e.innerHTML = e.innerHTML.replace(/基准日 \d{4}-\d{2}-\d{2}/, "基准日 " + stamp);
   });
   const rows = [...document.querySelectorAll("tr.open")].length;
   document.querySelectorAll(".sub").forEach(e => {

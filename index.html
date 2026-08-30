@@ -372,7 +372,7 @@
   <div id="list"></div>
 
   <footer>
-    数据来自各校研招系统与学院官方通知，逐条核对原文。<span id="stamp"></span><br>
+    数据来自各校研招系统与学院官方通知，逐条核对原文。<br>
     部分学校的院系时间只在报名系统内公布，已抓取后另页托管。以学校官方公告为准。
   </footer>
 </div>
@@ -390,10 +390,6 @@ let mode = "open";
     const a = x.d.split("-").map(Number);
     x.left = Math.round((new Date(a[0], a[1] - 1, a[2]) - today) / 86400000);
   }
-  const p = n => String(n).padStart(2, "0");
-  const stamp = today.getFullYear() + "-" + p(today.getMonth() + 1) + "-" + p(today.getDate());
-  const el = document.getElementById("stamp");
-  if (el) el.textContent = "基准日 " + stamp + "，倒计时按你打开页面的当天实时计算。";
 })();
 const esc = s => (s || "").replace(/[&<>"]/g, c =>
   ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
