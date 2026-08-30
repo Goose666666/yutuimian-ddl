@@ -72,8 +72,21 @@
     }
     if (!end) return;
     const a = end.split("-").map(Number);
-    const n = Math.round((new Date(a[0], a[1] - 1, a[2]) - today) / 86400000);
-    cell.textContent = n < 0 ? "已截止" : n === 0 ? "今天" : n === 1 ? "明天" : n + " 天";
+    let n = Math.round((new Date(a[0], a[1] - 1, a[2]) - today) / 86400000);
+    let past = false;
+    if (n === 0) {
+      let hm = null;
+      for (const td of tds) {
+        const g = (td.textContent || "").match(/(\d{1,2}):(\d{2})/g);
+        if (g && g.length) hm = g[g.length - 1];
+      }
+      if (hm) {
+        const b = hm.split(":").map(Number);
+        if (now > new Date(a[0], a[1] - 1, a[2], b[0], b[1])) { n = -1; past = true; }
+      }
+    }
+    cell.textContent = past ? "刚截止"
+      : n < 0 ? "已截止" : n === 0 ? "今天" : n === 1 ? "明天" : n + " 天";
     tr.className = n < 0 ? "gone" : "open";
   });
   const rows = [...document.querySelectorAll("tr.open")].length;

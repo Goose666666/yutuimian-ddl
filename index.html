@@ -389,12 +389,22 @@ let mode = "open";
   for (const x of DATA) {
     const a = x.d.split("-").map(Number);
     x.left = Math.round((new Date(a[0], a[1] - 1, a[2]) - today) / 86400000);
+    // 今天到期的再看钟点，过了就算已截止
+    x.past = false;
+    if (x.left === 0) {
+      const hm = (x.t || "").match(/^(\d{1,2}):(\d{2})$/);
+      if (hm) {
+        const h = Number(hm[1]) === 24 ? 24 : Number(hm[1]);
+        const end = new Date(a[0], a[1] - 1, a[2], h, Number(hm[2]));
+        if (now > end) { x.left = -1; x.past = true; }
+      }
+    }
   }
 })();
 const esc = s => (s || "").replace(/[&<>"]/g, c =>
   ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const sev = n => n < 0 ? "gone" : n <= 3 ? "hot" : n <= 9 ? "warm" : "cool";
-const leftText = n => n < 0 ? "已截止" : n === 0 ? "今天" : n === 1 ? "明天" : n + " 天";
+const leftText = (n, past) => past ? "刚截止" : n < 0 ? "已截止" : n === 0 ? "今天" : n === 1 ? "明天" : n + " 天";
 
 const CAT = [
   ["计算机", /计算机|软件|计算学部|计算与智能/],
@@ -500,7 +510,7 @@ function stats() {
   };
   set(0, open.length, "还能报");
   set(1, DATA.length - open.length, "已截止");
-  set(2, nx ? leftText(nx.left) : "—", nx ? nx.s : "最近");
+  set(2, nx ? leftText(nx.left, nx.past) : "—", nx ? nx.s : "最近");
   set(3, new Set(DATA.map(x => x.s)).size, "所学校");
 }
 
@@ -519,7 +529,8 @@ function render() {
     if (m !== month) { month = m; html += '<div class="month">' + Number(m) + " 月</div>"; }
     const dl = [
       ["截止", x.d + "　" + x.t, 1],
-      ["剩余", x.left < 0 ? "已截止 " + (-x.left) + " 天" : leftText(x.left), 1],
+      ["剩余", x.past ? "今天已过截止钟点"
+        : x.left < 0 ? "已截止 " + (-x.left) + " 天" : leftText(x.left), 1],
       ["学校", x.s, 0],
       ["院系", x.c, 0],
     ];
@@ -529,7 +540,7 @@ function render() {
         '<div class="row ' + sev(x.left) + '">' +
           badge(x.s) +
           '<div class="when">' + x.d.slice(5).replace("-", " / ") + " " + x.t + "</div>" +
-          '<div class="left">' + leftText(x.left) + "</div>" +
+          '<div class="left">' + leftText(x.left, x.past) + "</div>" +
           '<div class="col"><span class="sch">' + esc(x.s) + "</span>" +
             '<span class="dept">' + esc(x.c) + "</span></div>" +
           '<div class="go"><svg width="9" height="6" viewBox="0 0 9 6" fill="none">' +
