@@ -49,7 +49,7 @@
 <div class="kicker">2027 · 官方系统原始数据</div>
 <h1>复旦大学 2027 推免各院系报名时间</h1>
 <div class="sub">共 54 个院系，还开着 1 个。数据取自复旦研究生报考服务系统的
-「申请院系开放查询」，那一页要登录才能看。基准日 2026-08-29。
+「申请院系开放查询」，那一页要登录才能看。基准日 2026-08-30。
 <a href="../">返回全部学校</a></div>
 <table>
 <tr><th>代码</th><th>院系</th><th>开始</th><th>截止</th><th>剩余</th></tr>
@@ -58,3 +58,35 @@
 <footer>以复旦研究生院官方系统显示为准 ·
 <a href="https://gsas.fudan.edu.cn/logon">gsas.fudan.edu.cn</a></footer>
 </div>
+
+<script>
+(function () {
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const p = n => String(n).padStart(2, "0");
+  const stamp = today.getFullYear() + "-" + p(today.getMonth() + 1) + "-" + p(today.getDate());
+  document.querySelectorAll("tbody tr, table tr").forEach(tr => {
+    const tds = tr.querySelectorAll("td");
+    if (tds.length < 2) return;
+    const cell = tds[tds.length - 1];
+    let end = null;
+    for (const td of tds) {
+      const m = (td.textContent || "").match(/(\d{4})-(\d{2})-(\d{2})/g);
+      if (m && m.length) end = m[m.length - 1];
+    }
+    if (!end) return;
+    const a = end.split("-").map(Number);
+    const n = Math.round((new Date(a[0], a[1] - 1, a[2]) - today) / 86400000);
+    cell.textContent = n < 0 ? "已截止" : n === 0 ? "今天" : n === 1 ? "明天" : n + " 天";
+    tr.className = n < 0 ? "gone" : "open";
+  });
+  document.querySelectorAll(".sub, footer").forEach(e => {
+    e.innerHTML = e.innerHTML.replace(/基准日 \d{4}-\d{2}-\d{2}/, "基准日 " + stamp);
+  });
+  const rows = [...document.querySelectorAll("tr.open")].length;
+  document.querySelectorAll(".sub").forEach(e => {
+    e.innerHTML = e.innerHTML.replace(/还开着 \d+ 个/, "还开着 " + rows + " 个")
+      .replace(/可报名 \d+ 个/, "可报名 " + rows + " 个");
+  });
+})();
+</script>
